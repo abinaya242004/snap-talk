@@ -60,7 +60,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
     e.stopPropagation();
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/chatrooms/${roomId}/archive`,
+        `https://snap-talk-3-bl2l.onrender.com/api/chatrooms/${roomId}/archive`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -76,7 +76,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
     setArchiveError("");
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-password",
+        "https://snap-talk-3-bl2l.onrender.com/api/auth/verify-password",
         { password: archivePassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );

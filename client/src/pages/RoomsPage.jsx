@@ -64,7 +64,7 @@ const RoomsPage = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/chatrooms",
+        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
         { name: roomName },
         {
           headers: {

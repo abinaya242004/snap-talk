@@ -18,7 +18,7 @@ const UserListModal = ({ isOpen, onClose, onChatStarted }) => {
     if (isOpen) {
       const fetchUsers = async () => {
         try {
-          const response = await axios.get("http://localhost:5000/api/chatrooms/users", {
+          const response = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms/users", {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUsers(response.data);
@@ -35,13 +35,13 @@ const UserListModal = ({ isOpen, onClose, onChatStarted }) => {
   const startPrivateChat = async (recipientId) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/chatrooms/private",
+        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms/private",
         { recipientId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       // Update rooms list in redux to include the new/existing private chat
-      const roomsResponse = await axios.get("http://localhost:5000/api/chatrooms", {
+      const roomsResponse = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms", {
         headers: { Authorization: `Bearer ${token}` },
       });
       dispatch(setRooms(roomsResponse.data));

@@ -90,7 +90,7 @@ const ChatPage = () => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/messages/${roomId}`,
+          `https://snap-talk-3-bl2l.onrender.com/api/messages/${roomId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -146,7 +146,7 @@ const ChatPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/messages",
+        "https://snap-talk-3-bl2l.onrender.com/api/messages",
         {
           chatRoom: roomId,
           content,

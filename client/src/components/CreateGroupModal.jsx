@@ -19,7 +19,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     if (isOpen) {
       const fetchUsers = async () => {
         try {
-          const response = await axios.get("http://localhost:5000/api/chatrooms/users", {
+          const response = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms/users", {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUsers(response.data);
@@ -48,7 +48,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     setSubmitting(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/chatrooms",
+        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
         { 
           name: groupName, 
           users: [...selectedUsers, currentUser.id] 
@@ -57,7 +57,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
       );
       
       // Refresh rooms list
-      const roomsResponse = await axios.get("http://localhost:5000/api/chatrooms", {
+      const roomsResponse = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms", {
         headers: { Authorization: `Bearer ${token}` },
       });
       dispatch(setRooms(roomsResponse.data));
