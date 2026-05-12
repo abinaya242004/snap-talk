@@ -28,11 +28,14 @@ const RoomsPage = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/chatrooms", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       dispatch(setRooms(response.data));
     } catch (error) {
       console.log(error);
@@ -67,7 +70,7 @@ const RoomsPage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       setRoomName("");
@@ -94,22 +97,18 @@ const RoomsPage = () => {
       <AppNavigation />
 
       {/* Sidebar */}
-      <Sidebar
-        rooms={rooms}
-        onJoinRoom={handleJoinRoom}
-        activeRoomId={null}
-      />
+      <Sidebar rooms={rooms} onJoinRoom={handleJoinRoom} activeRoomId={null} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col relative min-w-0">
-        <Header 
-          roomName="" 
-          onlineUsersCount={0} 
-          roomAvatar={null} 
-          isGroup={false} 
-          isOnline={false} 
+        <Header
+          roomName=""
+          onlineUsersCount={0}
+          roomAvatar={null}
+          isGroup={false}
+          isOnline={false}
         />
-        
+
         <div className="flex-1 overflow-hidden">
           <EmptyState
             icon={FiMessageCircle}
@@ -140,9 +139,10 @@ const RoomsPage = () => {
       >
         <form onSubmit={createRoom} className="space-y-4">
           <p className="text-[var(--text-muted)] text-sm mb-4">
-            Give your new room a personality with a name. You can always change it later.
+            Give your new room a personality with a name. You can always change
+            it later.
           </p>
-          
+
           <Input
             label="Room Name"
             placeholder="e.g. 'Weekend Plans' or 'General Chat'"
@@ -168,10 +168,7 @@ const RoomsPage = () => {
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={creating || !roomName.trim()}
-            >
+            <Button type="submit" disabled={creating || !roomName.trim()}>
               {creating ? "Creating..." : "Create Room"}
             </Button>
           </div>

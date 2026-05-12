@@ -27,7 +27,7 @@ const ChatPage = () => {
 
   const { user, token } = useSelector((state) => state.auth);
   const { rooms, messages, typingUsers, onlineUsers } = useSelector(
-    (state) => state.chat
+    (state) => state.chat,
   );
 
   const [loading, setLoading] = useState(true);
@@ -52,11 +52,14 @@ const ChatPage = () => {
     const fetchRooms = async () => {
       if (rooms.length === 0) {
         try {
-          const response = await axios.get("http://localhost:5000/api/chatrooms", {
-            headers: {
-              Authorization: `Bearer ${token}`,
+          const response = await axios.get(
+            "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          });
+          );
           dispatch(setRooms(response.data));
         } catch (error) {
           console.log(error);
@@ -92,7 +95,7 @@ const ChatPage = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
         dispatch(setMessages(response.data));
       } catch (error) {
@@ -135,7 +138,11 @@ const ChatPage = () => {
     if (!content.trim()) return;
 
     // Emit stop typing event
-    socket.emit("typing", { room: roomId, isTyping: false, username: user.username });
+    socket.emit("typing", {
+      room: roomId,
+      isTyping: false,
+      username: user.username,
+    });
 
     try {
       const response = await axios.post(
@@ -148,7 +155,7 @@ const ChatPage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       socket.emit("sendMessage", response.data.data);
@@ -158,12 +165,20 @@ const ChatPage = () => {
   };
 
   const handleTyping = () => {
-    socket.emit("typing", { room: roomId, isTyping: true, username: user.username });
-    
+    socket.emit("typing", {
+      room: roomId,
+      isTyping: true,
+      username: user.username,
+    });
+
     // Clear typing indicator after 2 seconds of no typing
     clearTimeout(window.typingTimeout);
     window.typingTimeout = setTimeout(() => {
-      socket.emit("typing", { room: roomId, isTyping: false, username: user.username });
+      socket.emit("typing", {
+        room: roomId,
+        isTyping: false,
+        username: user.username,
+      });
     }, 2000);
   };
 
@@ -184,14 +199,20 @@ const ChatPage = () => {
       />
 
       {/* Main Chat Area */}
-      <div className={`flex-1 flex flex-col relative min-w-0 ${
-        activeRoom?.isGroup ? "bg-[var(--bg-chat)]" : "bg-[var(--bg-chat)]"
-      }`}>
+      <div
+        className={`flex-1 flex flex-col relative min-w-0 ${
+          activeRoom?.isGroup ? "bg-[var(--bg-chat)]" : "bg-[var(--bg-chat)]"
+        }`}
+      >
         {/* Subtle Pattern for Groups Only */}
         {activeRoom?.isGroup && (
-          <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]" 
-               style={{ backgroundImage: `radial-gradient(var(--text-main) 1px, transparent 0)`, backgroundSize: '24px 24px' }}>
-          </div>
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: `radial-gradient(var(--text-main) 1px, transparent 0)`,
+              backgroundSize: "24px 24px",
+            }}
+          ></div>
         )}
 
         {(() => {
@@ -201,11 +222,16 @@ const ChatPage = () => {
           let lastSeen = null;
 
           if (activeRoom && !activeRoom.isGroup) {
-            const otherUser = activeRoom.users?.find(u => u._id !== (user?.id || user?._id));
+            const otherUser = activeRoom.users?.find(
+              (u) => u._id !== (user?.id || user?._id),
+            );
             if (otherUser) {
               displayName = otherUser.username;
               displayAvatar = otherUser.avatar;
-              isOnline = onlineUsers.some(u => (u.userId || u.id)?.toString() === otherUser._id?.toString());
+              isOnline = onlineUsers.some(
+                (u) =>
+                  (u.userId || u.id)?.toString() === otherUser._id?.toString(),
+              );
               lastSeen = otherUser.lastSeen;
             } else if (displayName?.startsWith("private-")) {
               displayName = "Chat";
@@ -236,7 +262,9 @@ const ChatPage = () => {
                 transition={{ duration: 0.5 }}
                 className="w-24 h-24 mb-4 rounded-full bg-[var(--bg-card)] flex items-center justify-center shadow-inner"
               >
-                <span className="text-4xl text-[var(--primary-accent)]/80">👋</span>
+                <span className="text-4xl text-[var(--primary-accent)]/80">
+                  👋
+                </span>
               </motion.div>
               <h3 className="text-xl font-bold text-[var(--text-main)] mb-2">
                 Say hello!
@@ -248,7 +276,7 @@ const ChatPage = () => {
                 {messages.map((msg, index) => {
                   const showDateDivider = false; // Logic to show date dividers can be added here
                   const isOwnMessage = msg.user._id === user?.id;
-                  
+
                   return (
                     <ChatBubble
                       key={msg._id || index}
@@ -278,17 +306,31 @@ const ChatPage = () => {
                 <motion.div
                   className="w-1.5 h-1.5 bg-[var(--primary-accent)] rounded-full"
                   animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut" }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 0.6,
+                    ease: "easeInOut",
+                  }}
                 />
                 <motion.div
                   className="w-1.5 h-1.5 bg-[var(--primary-accent)] rounded-full"
                   animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, delay: 0.1, ease: "easeInOut" }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 0.6,
+                    delay: 0.1,
+                    ease: "easeInOut",
+                  }}
                 />
                 <motion.div
                   className="w-1.5 h-1.5 bg-[var(--primary-accent)] rounded-full"
                   animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, delay: 0.2, ease: "easeInOut" }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 0.6,
+                    delay: 0.2,
+                    ease: "easeInOut",
+                  }}
                 />
               </div>
             </motion.div>

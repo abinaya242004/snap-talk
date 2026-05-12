@@ -38,20 +38,22 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData
+        "https://snap-talk-3-bl2l.onrender.com/api/auth/login",
+        formData,
       );
 
       dispatch(
         loginSuccess({
           user: response.data.user,
           token: response.data.token,
-        })
+        }),
       );
 
       navigate("/rooms");
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Login failed. Please check your credentials.";
+      const errorMsg =
+        error.response?.data?.message ||
+        "Login failed. Please check your credentials.";
       setErrorLocal(errorMsg);
       dispatch(setError(errorMsg));
     } finally {
@@ -87,7 +89,9 @@ const LoginPage = () => {
           <h1 className="text-3xl font-black text-[var(--text-main)] tracking-tighter">
             Snap <span className="text-[var(--primary-accent)]">Talk</span>
           </h1>
-          <p className="text-zinc-500 text-sm font-medium mt-1">Welcome back!</p>
+          <p className="text-zinc-500 text-sm font-medium mt-1">
+            Welcome back!
+          </p>
         </div>
 
         {/* Form Card */}
