@@ -51,22 +51,24 @@ const RegisterPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://snap-talk-3-bl2l.onrender.com/api/auth/register",
         {
           username: formData.username,
           password: formData.password,
-        }
+        },
       );
 
       dispatch(
         registerSuccess({
           user: response.data.user,
-        })
+        }),
       );
 
       navigate("/");
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Registration failed. Please try again.";
+      const errorMsg =
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
       setErrorLocal(errorMsg);
       dispatch(setError(errorMsg));
     } finally {
@@ -80,7 +82,7 @@ const RegisterPage = () => {
       <div className="hidden lg:flex lg:w-1/2 relative bg-[var(--bg-main)] items-center justify-center overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[var(--primary-accent)]/20 blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-[var(--secondary-accent)]/20 blur-[120px]" />
-        
+
         <div className="relative z-10 text-center px-12">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -90,7 +92,7 @@ const RegisterPage = () => {
           >
             <TbMessageCircleHeart size={70} />
           </motion.div>
-          
+
           <motion.h1
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -99,14 +101,15 @@ const RegisterPage = () => {
           >
             Snap <span className="text-[var(--primary-accent)]">Talk</span>
           </motion.h1>
-          
+
           <motion.p
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
             className="text-xl text-[var(--text-muted)] font-medium max-w-md mx-auto leading-relaxed"
           >
-            Experience the future of communication. Beautiful, private, and blazingly fast.
+            Experience the future of communication. Beautiful, private, and
+            blazingly fast.
           </motion.p>
         </div>
 
@@ -128,8 +131,12 @@ const RegisterPage = () => {
           className="w-full max-w-[380px] bg-white dark:bg-[#121215] p-8 rounded-[32px] border border-zinc-100 dark:border-zinc-800 shadow-xl shadow-black/[0.02]"
         >
           <div className="mb-6 text-center">
-            <h2 className="text-3xl font-black text-[#1a1a1a] dark:text-white mb-1 leading-tight">Create Account</h2>
-            <p className="text-zinc-500 text-xs font-medium tracking-wide uppercase">Join Snap Talk</p>
+            <h2 className="text-3xl font-black text-[#1a1a1a] dark:text-white mb-1 leading-tight">
+              Create Account
+            </h2>
+            <p className="text-zinc-500 text-xs font-medium tracking-wide uppercase">
+              Join Snap Talk
+            </p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
@@ -171,7 +178,9 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 icon={FiCheckCircle}
                 rightIcon={showConfirmPassword ? FiEyeOff : FiEye}
-                onRightIconClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                onRightIconClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
                 required
                 minLength="6"
                 error={error}
@@ -181,7 +190,12 @@ const RegisterPage = () => {
 
             <Button
               type="submit"
-              disabled={loading || !formData.username || !formData.password || !formData.confirmPassword}
+              disabled={
+                loading ||
+                !formData.username ||
+                !formData.password ||
+                !formData.confirmPassword
+              }
               fullWidth
               size="lg"
               className="py-3 rounded-xl text-sm font-bold bg-[var(--primary-accent)] hover:bg-[var(--primary-accent)]/90 text-white shadow-lg shadow-pink-500/20 transition-all active:scale-[0.98] mt-6"
