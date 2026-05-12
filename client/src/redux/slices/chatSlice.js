@@ -21,6 +21,13 @@ const chatSlice = createSlice({
     setRooms: (state, action) => {
       state.rooms = action.payload;
     },
+    
+    addRoom: (state, action) => {
+      const room = action.payload;
+      if (!state.rooms.some(r => r._id.toString() === room._id.toString())) {
+        state.rooms.unshift(room);
+      }
+    },
 
     setActiveRoom: (state, action) => {
       state.activeRoom = action.payload;
@@ -116,6 +123,7 @@ const chatSlice = createSlice({
 
 export const {
   setRooms,
+  addRoom,
   setActiveRoom,
   setSidebarTab,
   setMessages,

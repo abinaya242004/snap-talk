@@ -55,6 +55,16 @@ const socketHandler = (io) => {
       }
     });
 
+    // ROOM CREATED
+    socket.on("createRoom", (roomData) => {
+      if (roomData && roomData.users) {
+        roomData.users.forEach(userObj => {
+          const userId = userObj._id || userObj.id || userObj;
+          io.to(userId.toString()).emit("newRoom", roomData);
+        });
+      }
+    });
+
     // TYPING INDICATOR
     socket.on("typing", (data) => {
       const roomId = data.room || data.roomId;

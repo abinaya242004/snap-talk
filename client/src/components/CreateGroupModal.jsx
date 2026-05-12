@@ -5,6 +5,7 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setRooms } from "../redux/slices/chatSlice";
 import Avatar from "./Avatar";
+import socket from "../socket/socket";
 
 const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
   const [groupName, setGroupName] = useState("");
@@ -60,6 +61,11 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
       const roomsResponse = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Emit socket event for real-time update
+      if (response.data.room) {
+        socket.emit("createRoom", response.data.room);
+      }
+
       dispatch(setRooms(roomsResponse.data));
       
       onGroupCreated(response.data.room._id);

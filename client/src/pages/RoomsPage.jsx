@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { FiMessageCircle, FiPlus } from "react-icons/fi";
-import { setRooms } from "../redux/slices/chatSlice";
+import { setRooms, addRoom, addMessage, setOnlineUsers } from "../redux/slices/chatSlice";
+import socket from "../socket/socket";
 import Sidebar from "../components/Sidebar";
 import AppNavigation from "../components/AppNavigation";
 import Header from "../components/Header";
@@ -17,7 +18,7 @@ import Loader from "../components/Loader";
 const RoomsPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.auth);
   const { rooms } = useSelector((state) => state.chat);
 
   const [roomName, setRoomName] = useState("");
@@ -52,6 +53,31 @@ const RoomsPage = () => {
     fetchRooms();
   }, [token, navigate]);
 
+  // Socket connection
+  useEffect(() => {
+    if (!user) return;
+
+    socket.emit("userJoin", { username: user.username, userId: user.id || user._id });
+
+    socket.on("newRoom", (room) => {
+      dispatch(addRoom(room));
+    });
+
+    socket.on("receiveMessage", (message) => {
+      dispatch(addMessage(message));
+    });
+
+    socket.on("onlineUsers", (users) => {
+      dispatch(setOnlineUsers(users));
+    });
+
+    return () => {
+      socket.off("newRoom");
+      socket.off("receiveMessage");
+      socket.off("onlineUsers");
+    };
+  }, [user, dispatch]);
+
   const createRoom = async (e) => {
     e.preventDefault();
     if (!roomName.trim()) {
@@ -63,7 +89,7 @@ const RoomsPage = () => {
     setErrorLocal("");
 
     try {
-      await axios.post(
+      const response = await axios.post(
         "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
         { name: roomName },
         {
@@ -72,6 +98,11 @@ const RoomsPage = () => {
           },
         },
       );
+
+      // Emit socket event for real-time update
+      if (response.data.room) {
+        socket.emit("createRoom", response.data.room);
+      }
 
       setRoomName("");
       setShowCreateModal(false);

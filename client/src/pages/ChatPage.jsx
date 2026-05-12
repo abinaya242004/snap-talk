@@ -10,6 +10,7 @@ import {
   addMessage,
   setTypingUsers,
   setOnlineUsers,
+  addRoom,
   setActiveRoom as setActiveRoomRedux,
 } from "../redux/slices/chatSlice";
 import Sidebar from "../components/Sidebar";
@@ -127,10 +128,15 @@ const ChatPage = () => {
       dispatch(setOnlineUsers(users));
     });
 
+    socket.on("newRoom", (room) => {
+      dispatch(addRoom(room));
+    });
+
     return () => {
       socket.off("receiveMessage");
       socket.off("userTyping");
       socket.off("onlineUsers");
+      socket.off("newRoom");
     };
   }, [roomId, user, dispatch]);
 
