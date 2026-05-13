@@ -94,7 +94,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
   };
 
   return (
-    <div className="w-[320px] md:w-[350px] h-screen bg-[var(--bg-rooms-list)] border-r border-[var(--border-color)] flex flex-col flex-shrink-0 z-10 relative transition-colors">
+    <div className="w-full md:w-[320px] lg:w-[350px] h-screen bg-[var(--bg-rooms-list)] border-r border-[var(--border-color)] flex flex-col flex-shrink-0 z-10 relative transition-colors">
       <UserListModal isOpen={showUserList} onClose={() => setShowUserList(false)} onChatStarted={onJoinRoom} />
       <CreateGroupModal isOpen={showCreateGroup} onClose={() => setShowCreateGroup(false)} onGroupCreated={onJoinRoom} />
       
@@ -143,7 +143,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="p-6 pb-4">
+      <div className="p-4 md:p-6 md:pb-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             {activeTab === "archive" && (
@@ -154,7 +154,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
                 <FiArrowLeft size={20} />
               </button>
             )}
-            <h2 className="text-[28px] font-bold text-[var(--text-main)] tracking-tighter">
+            <h2 className="text-2xl md:text-[28px] font-bold text-[var(--text-main)] tracking-tighter">
               {activeTab === "archive" ? "Private Vault" : "Messages"}
             </h2>
           </div>
@@ -172,7 +172,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-4 space-y-2 pb-10">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-2 md:px-4 space-y-2 pb-10">
         
         {/* Archived Entry Row (WhatsApp Style) - Only in All Chats & if there are archives */}
         {activeTab === "all_chats" && archivedRooms.length > 0 && (
@@ -233,26 +233,46 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
               
               return (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2 }} key={room._id} onClick={() => onJoinRoom(room._id)}
-                  className={`group w-full flex items-start p-4 rounded-3xl transition-all duration-300 text-left relative overflow-hidden cursor-pointer mb-1 border border-transparent ${isActive ? "bg-[var(--bg-card)] border-[var(--border-color)] shadow-xl" : "hover:bg-[var(--bg-card)]/40"}`}
+                  className={`group w-full flex items-start p-4 rounded-3xl transition-all duration-300 text-left relative overflow-hidden cursor-pointer mb-2 border ${
+                    isActive 
+                      ? "bg-[var(--bg-card)] border-[var(--border-color)] shadow-xl scale-[1.02] z-10" 
+                      : room.unreadCount > 0
+                        ? "bg-[var(--primary-accent)]/5 border-[var(--primary-accent)]/20 shadow-lg shadow-[var(--primary-accent)]/5"
+                        : "hover:bg-[var(--bg-card)]/40 border-transparent"
+                  }`}
                 >
+                  {/* Unread Glow Effect */}
+                  {room.unreadCount > 0 && !isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary-accent)]/10 to-transparent pointer-events-none" />
+                  )}
+
                   {room.isGroup ? (
-                    <div className="p-[2px] rounded-full border-2 border-[var(--primary-accent)]/20 flex-shrink-0 group-hover:border-[var(--primary-accent)]/50 transition-all">
-                      <Avatar src={displayAvatar} alt={displayName} size="lg" initials={displayName?.substring(0, 2).toUpperCase()} status={null} />
-                    </div>
+                    <Avatar src={displayAvatar} alt={displayName} size="lg" initials={displayName?.substring(0, 2).toUpperCase()} status={null} />
                   ) : (
                     <Avatar src={displayAvatar} alt={displayName} size="lg" initials={displayName?.substring(0, 2).toUpperCase()} status={isOnline ? "online" : null} />
                   )}
                 
-                  <div className="ml-4 flex-1 min-w-0">
+                  <div className="ml-4 flex-1 min-w-0 z-10">
                     <div className="flex justify-between items-baseline mb-1">
                       <div className="flex items-center truncate pr-2">
                         <h3 className={`text-base font-bold truncate transition-colors ${room.unreadCount > 0 ? "text-[var(--primary-accent)]" : "text-[var(--text-main)]"}`}>{displayName}</h3>
+                        {room.unreadCount > 0 && (
+                          <span className="ml-2 w-2 h-2 rounded-full bg-[var(--primary-accent)] animate-pulse" />
+                        )}
                       </div>
                       <span className={`text-[10px] font-black tracking-tighter flex-shrink-0 ${room.unreadCount > 0 ? "text-[var(--primary-accent)]" : "text-[var(--text-muted)]"}`}>{time}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className={`text-sm truncate pr-2 font-medium transition-colors ${isActive ? "text-[var(--text-main)]/70" : "text-[var(--text-muted)]"}`}>{lastMsg}</p>
-                      {room.unreadCount > 0 && <div className="w-5 h-5 rounded-full bg-[var(--primary-accent)] flex items-center justify-center text-[10px] font-black text-white flex-shrink-0 shadow-lg shadow-pink-500/20">{room.unreadCount}</div>}
+                      <p className={`text-sm truncate pr-2 font-medium transition-colors ${room.unreadCount > 0 ? "text-[var(--text-main)] font-bold" : isActive ? "text-[var(--text-main)]/70" : "text-[var(--text-muted)]"}`}>{lastMsg}</p>
+                      {room.unreadCount > 0 && (
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="w-6 h-6 rounded-full bg-[var(--primary-accent)] flex items-center justify-center text-[11px] font-black text-white flex-shrink-0 shadow-lg shadow-pink-500/40 border-2 border-white dark:border-zinc-900"
+                        >
+                          {room.unreadCount}
+                        </motion.div>
+                      )}
                     </div>
                   </div>
 

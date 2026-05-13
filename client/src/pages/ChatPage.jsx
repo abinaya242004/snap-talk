@@ -193,20 +193,24 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-main)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-main)] relative">
       {/* App Navigation */}
       <AppNavigation />
 
-      {/* Sidebar */}
-      <Sidebar
-        rooms={rooms}
-        onJoinRoom={handleJoinRoom}
-        activeRoomId={roomId}
-      />
+      {/* Sidebar - Hidden on mobile if roomId is present */}
+      <div className={`${roomId ? "hidden md:block" : "block w-full md:w-auto"}`}>
+        <Sidebar
+          rooms={rooms}
+          onJoinRoom={handleJoinRoom}
+          activeRoomId={roomId}
+        />
+      </div>
 
-      {/* Main Chat Area */}
+      {/* Main Chat Area - Hidden on mobile if roomId is NOT present */}
       <div
         className={`flex-1 flex flex-col relative min-w-0 ${
+          !roomId ? "hidden md:flex" : "flex"
+        } ${
           activeRoom?.isGroup ? "bg-[var(--bg-chat)]" : "bg-[var(--bg-chat)]"
         }`}
       >

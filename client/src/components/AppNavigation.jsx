@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { FiMessageSquare, FiHash, FiUsers, FiLogOut, FiArchive } from "react-icons/fi";
 import { TbMessageCircleHeart } from "react-icons/tb";
@@ -7,10 +7,13 @@ import { setSidebarTab } from "../redux/slices/chatSlice";
 
 const AppNavigation = () => {
   const navigate = useNavigate();
+  const { roomId } = useParams();
   const dispatch = useDispatch();
   
   const { rooms, activeTab } = useSelector((state) => state.chat);
   const totalUnread = rooms?.reduce((sum, room) => sum + (room.unreadCount || 0), 0) || 0;
+  const unreadGroups = rooms?.filter(r => r.isGroup).reduce((sum, room) => sum + (room.unreadCount || 0), 0) || 0;
+  const unreadContacts = rooms?.filter(r => !r.isGroup).reduce((sum, room) => sum + (room.unreadCount || 0), 0) || 0;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -19,8 +22,8 @@ const AppNavigation = () => {
 
   const navItems = [
     { id: "all_chats", label: "All Chats", icon: FiMessageSquare, badge: totalUnread },
-    { id: "groups", label: "Groups", icon: FiHash },
-    { id: "contacts", label: "Contacts", icon: FiUsers },
+    { id: "groups", label: "Groups", icon: FiHash, badge: unreadGroups },
+    { id: "contacts", label: "Contacts", icon: FiUsers, badge: unreadContacts },
   ];
 
   return (
@@ -79,7 +82,7 @@ const AppNavigation = () => {
       </div>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[var(--bg-app-nav)]/95 backdrop-blur-lg border-t border-[var(--border-color)] flex items-center justify-around px-4 z-[1000]">
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[var(--bg-app-nav)]/95 backdrop-blur-lg border-t border-[var(--border-color)] flex items-center justify-around px-4 z-[1000] ${roomId ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"} transition-all duration-300`}>
         {navItems.map((item) => {
           const isActive = item.id === activeTab;
           return (

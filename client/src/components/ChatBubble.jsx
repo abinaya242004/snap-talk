@@ -15,7 +15,7 @@ const ChatBubble = ({ message, isOwnMessage, sender }) => {
       }`}
     >
       <div
-        className={`flex max-w-[75%] md:max-w-[65%] ${
+        className={`flex max-w-[85%] md:max-w-[75%] lg:max-w-[65%] ${
           isOwnMessage ? "flex-row-reverse" : "flex-row"
         }`}
       >

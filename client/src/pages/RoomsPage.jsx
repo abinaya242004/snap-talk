@@ -128,10 +128,12 @@ const RoomsPage = () => {
       <AppNavigation />
 
       {/* Sidebar */}
-      <Sidebar rooms={rooms} onJoinRoom={handleJoinRoom} activeRoomId={null} />
+      <div className="block w-full md:w-auto">
+        <Sidebar rooms={rooms} onJoinRoom={handleJoinRoom} activeRoomId={null} />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col relative min-w-0">
+      <div className="hidden md:flex flex-1 flex-col relative min-w-0">
         <Header
           roomName=""
           onlineUsersCount={0}
