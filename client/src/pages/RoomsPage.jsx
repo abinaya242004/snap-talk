@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import axios from "../api/axios";
 import { motion } from "framer-motion";
 import { FiMessageCircle, FiPlus } from "react-icons/fi";
 import { setRooms, addRoom, addMessage, setOnlineUsers } from "../redux/slices/chatSlice";
+
 import socket from "../socket/socket";
 import Sidebar from "../components/Sidebar";
 import AppNavigation from "../components/AppNavigation";
@@ -29,14 +30,7 @@ const RoomsPage = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get(
-        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await axios.get("/chatrooms");
       dispatch(setRooms(response.data));
     } catch (error) {
       console.log(error);
@@ -89,24 +83,17 @@ const RoomsPage = () => {
     setErrorLocal("");
 
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
-        { name: roomName },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await axios.post("/chatrooms", { name: roomName });
+      const newRoom = response.data.room;
 
-      // Emit socket event for real-time update
-      if (response.data.room) {
-        socket.emit("createRoom", response.data.room);
+      if (newRoom) {
+        // Optimistically add to sidebar — no need to refetch all rooms
+        dispatch(addRoom(newRoom));
+        socket.emit("createRoom", newRoom);
       }
 
       setRoomName("");
       setShowCreateModal(false);
-      fetchRooms();
     } catch (error) {
       setErrorLocal(error.response?.data?.message || "Failed to create room");
     } finally {

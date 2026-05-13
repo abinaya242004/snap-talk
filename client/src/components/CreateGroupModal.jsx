@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiCheck, FiUsers } from "react-icons/fi";
-import axios from "axios";
+import axios from "../api/axios";
 import { useSelector, useDispatch } from "react-redux";
-import { setRooms } from "../redux/slices/chatSlice";
+import { setRooms, addRoom } from "../redux/slices/chatSlice";
 import Avatar from "./Avatar";
 import socket from "../socket/socket";
 
@@ -20,9 +20,7 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     if (isOpen) {
       const fetchUsers = async () => {
         try {
-          const response = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms/users", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await axios.get("/chatrooms/users");
           setUsers(response.data);
         } catch (error) {
           console.log(error);
@@ -48,33 +46,30 @@ const CreateGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
 
     setSubmitting(true);
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
-        { 
-          name: groupName, 
-          users: [...selectedUsers, currentUser.id] 
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      // Refresh rooms list
-      const roomsResponse = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms", {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.post("/chatrooms", { 
+        name: groupName, 
+        users: [...selectedUsers, (currentUser.id || currentUser._id)] 
       });
-      // Emit socket event for real-time update
-      if (response.data.room) {
-        socket.emit("createRoom", response.data.room);
-      }
-
-      dispatch(setRooms(roomsResponse.data));
       
-      onGroupCreated(response.data.room._id);
-      onClose();
-      // Reset
-      setGroupName("");
-      setSelectedUsers([]);
+      const newRoom = response.data.room;
+
+      if (newRoom) {
+        // Optimistically add room
+        dispatch(addRoom(newRoom));
+        
+        // Notify others via socket
+        socket.emit("createRoom", newRoom);
+        
+        // Navigate immediately
+        onGroupCreated(newRoom._id);
+        onClose();
+        
+        // Reset
+        setGroupName("");
+        setSelectedUsers([]);
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Group creation failed:", error);
     } finally {
       setSubmitting(false);
     }

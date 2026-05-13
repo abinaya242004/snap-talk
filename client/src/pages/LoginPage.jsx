@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import axios from "../api/axios";
 import { motion } from "framer-motion";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { TbMessageCircleHeart } from "react-icons/tb";
@@ -37,10 +37,7 @@ const LoginPage = () => {
     setErrorLocal("");
 
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/auth/login",
-        formData,
-      );
+      const response = await axios.post("/auth/login", formData);
 
       dispatch(
         loginSuccess({

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiSearch, FiUserPlus } from "react-icons/fi";
-import axios from "axios";
+import axios from "../api/axios";
 import { useSelector, useDispatch } from "react-redux";
-import { setRooms } from "../redux/slices/chatSlice";
+import { setRooms, addRoom } from "../redux/slices/chatSlice";
 import Avatar from "./Avatar";
 import socket from "../socket/socket";
 
 const UserListModal = ({ isOpen, onClose, onChatStarted }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [startingChat, setStartingChat] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { token } = useSelector((state) => state.auth);
   const { onlineUsers } = useSelector((state) => state.chat);
@@ -19,9 +20,7 @@ const UserListModal = ({ isOpen, onClose, onChatStarted }) => {
     if (isOpen) {
       const fetchUsers = async () => {
         try {
-          const response = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms/users", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await axios.get("/chatrooms/users");
           setUsers(response.data);
         } catch (error) {
           console.log(error);
@@ -34,28 +33,28 @@ const UserListModal = ({ isOpen, onClose, onChatStarted }) => {
   }, [isOpen, token]);
 
   const startPrivateChat = async (recipientId) => {
+    if (startingChat) return;
+    setStartingChat(recipientId);
+    
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/chatrooms/private",
-        { recipientId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      // Update rooms list in redux to include the new/existing private chat
-      const roomsResponse = await axios.get("https://snap-talk-3-bl2l.onrender.com/api/chatrooms", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // Emit socket event for real-time update
-      if (response.data.room) {
-        socket.emit("createRoom", response.data.room);
-      }
+      const response = await axios.post("/chatrooms/private", { recipientId });
+      const newRoom = response.data.room;
 
-      dispatch(setRooms(roomsResponse.data));
-      
-      onChatStarted(response.data.room._id);
-      onClose();
+      if (newRoom) {
+        // Optimistically add room to Sidebar if it's not there
+        dispatch(addRoom(newRoom)); 
+        
+        // Notify others via socket
+        socket.emit("createRoom", newRoom);
+        
+        // Navigate immediately
+        onChatStarted(newRoom._id);
+        onClose();
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Failed to start chat:", error);
+    } finally {
+      setStartingChat(null);
     }
   };
 
@@ -144,8 +143,12 @@ const UserListModal = ({ isOpen, onClose, onChatStarted }) => {
                           {isOnline ? "Active Now" : "Offline"}
                         </p>
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-[var(--primary-accent)]/10 flex items-center justify-center text-[var(--primary-accent)] opacity-0 group-hover:opacity-100 transition-opacity">
-                        <FiUserPlus size={18} />
+                      <div className={`w-10 h-10 rounded-full bg-[var(--primary-accent)]/10 flex items-center justify-center text-[var(--primary-accent)] transition-all ${startingChat === u._id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                        {startingChat === u._id ? (
+                          <div className="w-5 h-5 border-2 border-[var(--primary-accent)] border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <FiUserPlus size={18} />
+                        )}
                       </div>
                     </button>
                   );

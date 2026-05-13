@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiPlus, FiUsers, FiArchive, FiLock, FiUnlock, FiArrowLeft, FiChevronRight } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
+import axios from "../api/axios";
 import { updateRoom, setSidebarTab } from "../redux/slices/chatSlice";
 import Avatar from "./Avatar";
 import UserListModal from "./UserListModal";
@@ -59,11 +59,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
   const handleToggleArchive = async (e, roomId) => {
     e.stopPropagation();
     try {
-      const response = await axios.put(
-        `https://snap-talk-3-bl2l.onrender.com/api/chatrooms/${roomId}/archive`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.put(`/chatrooms/${roomId}/archive`);
       dispatch(updateRoom(response.data.room));
     } catch (error) {
       console.error("Archive toggle failed:", error);
@@ -75,11 +71,7 @@ const Sidebar = ({ rooms = [], onJoinRoom, activeRoomId }) => {
     setIsVerifying(true);
     setArchiveError("");
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/auth/verify-password",
-        { password: archivePassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.post("/auth/verify-password", { password: archivePassword });
       if (response.data.success) {
         setIsArchiveUnlocked(true);
         setShowUnlockModal(false);

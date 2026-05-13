@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import axios from "../api/axios";
 import { motion } from "framer-motion";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheckCircle } from "react-icons/fi";
 import { TbMessageCircleHeart } from "react-icons/tb";
@@ -50,13 +50,10 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/auth/register",
-        {
-          username: formData.username,
-          password: formData.password,
-        },
-      );
+      const response = await axios.post("/auth/register", {
+        username: formData.username,
+        password: formData.password,
+      });
 
       dispatch(
         registerSuccess({

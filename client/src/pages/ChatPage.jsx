@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import axios from "../api/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import socket from "../socket/socket";
 import {
@@ -53,14 +53,7 @@ const ChatPage = () => {
     const fetchRooms = async () => {
       if (rooms.length === 0) {
         try {
-          const response = await axios.get(
-            "https://snap-talk-3-bl2l.onrender.com/api/chatrooms",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
+          const response = await axios.get("/chatrooms");
           dispatch(setRooms(response.data));
         } catch (error) {
           console.log(error);
@@ -90,14 +83,7 @@ const ChatPage = () => {
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(
-          `https://snap-talk-3-bl2l.onrender.com/api/messages/${roomId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const response = await axios.get(`/messages/${roomId}`);
         dispatch(setMessages(response.data));
       } catch (error) {
         console.log(error);
@@ -151,18 +137,10 @@ const ChatPage = () => {
     });
 
     try {
-      const response = await axios.post(
-        "https://snap-talk-3-bl2l.onrender.com/api/messages",
-        {
-          chatRoom: roomId,
-          content,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await axios.post("/messages", {
+        chatRoom: roomId,
+        content,
+      });
 
       socket.emit("sendMessage", response.data.data);
     } catch (error) {
