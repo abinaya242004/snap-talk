@@ -20,7 +20,7 @@ const Header = ({ roomName, onlineUsersCount, roomAvatar, isGroup, isOnline, las
         {/* Back Button for Mobile */}
         {roomId && (
           <button 
-            onClick={() => navigate("/chat")}
+            onClick={() => navigate("/rooms")}
             className="md:hidden mr-3 p-2 rounded-xl bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--primary-accent)] transition-all active:scale-90"
           >
             <FiArrowLeft size={20} />
